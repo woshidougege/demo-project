@@ -149,3 +149,5 @@ public class UserService {
                 .orElse(0L) + 1;
     }
 }
+
+// DEMO: temporary change for @git diff demo

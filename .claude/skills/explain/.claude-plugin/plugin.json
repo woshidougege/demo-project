@@ -1,0 +1,7 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "explain",
+  "version": "0.1.0",
+  "description": "解释代码逻辑",
+  "skills": ["./"]
+}

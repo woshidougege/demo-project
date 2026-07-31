@@ -1,0 +1,7 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "write-test",
+  "version": "0.1.0",
+  "description": "为 Java 文件编写单元测试",
+  "skills": ["./"]
+}
