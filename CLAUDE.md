@@ -1,84 +1,27 @@
-# CLAUDE.md
+# 项目记忆
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## 项目概述
+Java Maven 演示项目，三层架构（Controller → Service → Model），JDK 11。
 
-## Build System
-
-This is a Maven project using Java 11.
-
-**Build the project:**
+## 构建命令
 ```bash
-mvn clean compile
+mvn clean compile      # 编译
+mvn test               # 跑测试
+mvn package            # 打包
 ```
 
-**Run tests:**
-```bash
-mvn test
-```
+## 架构说明
+- **model 层**: User（用户实体）、Order（订单实体）
+- **service 层**: UserService（用户服务）、OrderService（订单服务），用 ConcurrentHashMap 模拟数据库
+- **controller 层**: UserController，REST 风格接口
+- **util 层**: StringUtils 字符串工具
 
-**Run a specific test class:**
-```bash
-mvn test -Dtest=UserServiceTest
-```
+## 代码规范
+- 方法命名：驼峰
+- 注释：中文
+- 测试命名：`方法名_场景_期望结果`
 
-**Run a specific test method:**
-```bash
-mvn test -Dtest=UserServiceTest#findById_用户存在_返回对应用户
-```
-
-**Package:**
-```bash
-mvn package
-```
-
-## Architecture
-
-This is a demo project showcasing a three-layer architecture:
-
-**Model Layer** (`com.example.model`)
-- `User`: User entity with role-based access (ADMIN/USER/GUEST), logical deletion via `active` flag
-- `Order`: Order entity linked to users via `userId`, with status workflow (PENDING → PAID → SHIPPED → COMPLETED/CANCELLED)
-
-**Service Layer** (`com.example.service`)
-- `UserService`: In-memory user management with ConcurrentHashMap as database simulation
-- `OrderService`: Order management that depends on UserService, uses ConcurrentHashMap for storage
-- Both services use `AtomicLong`/stream-based ID generation for concurrency
-
-**Controller Layer** (`com.example.controller`)
-- `UserController`: REST-style endpoint handlers that coordinate UserService and OrderService
-- Returns `Map<String, Object>` responses with `code`, `data`, `message` fields
-
-**Utilities** (`com.example.util`)
-- `StringUtils`: Common string operations, validation (email/phone), case conversion
-
-## Known Issues (Intentional for Demo)
-
-The codebase intentionally contains bugs for demonstration/review purposes. Comments in the code mark these with "BUG:":
-
-- `UserService.update()`: Missing null check, throws NPE when user doesn't exist
-- `UserService.search()`: Missing null check on keyword parameter
-- `UserService.login()`: Uses plain string comparison instead of BCrypt, returns null for nonexistent users
-- `UserController.createUser()`: No input validation
-- `UserController.updateUser()`: No exception handling for NPE
-- `UserController.searchUsers()`: Passes null keyword directly to service
-- `UserController.createOrder()`: Doesn't validate user existence before creating order
-- `UserController.batchUpdateRole()`: Missing authorization check
-- `OrderService.createOrder()`: Doesn't validate user existence
-- `OrderService.cancelOrder()`: Allows canceling already-paid orders
-- `OrderService.findByUserId()`: Performance issue - full collection scan instead of indexed lookup
-- `OrderService.getOrderDetail()`: N+1 query problem
-- `StringUtils.buildLikeQuery()`: SQL injection vulnerability via direct string concatenation
-
-## Testing Conventions
-
-Tests use JUnit 5 with the following naming pattern:
-`methodName_scenario_expectedResult` in Chinese
-
-Example: `findById_用户存在_返回对应用户`
-
-Each test includes a comment explaining the intent (`意图：...`).
-
-Test structure:
-- `@BeforeEach` creates fresh service instances for isolation
-- Helper methods like `createAndSaveUser()` reduce boilerplate
-- Tests document known bugs with comments like "已知 BUG"
+## 注意事项
+- 请用中文回答所有问题
+- 测试使用 JUnit 5 + Mockito
+- 代码里标了 `BUG:` 的地方是已知问题
