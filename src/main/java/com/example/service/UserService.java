@@ -71,11 +71,25 @@ public class UserService {
      * 更新用户信息
      */
     public User update(Long id, User updateData) {
+        if (id == null) {
+            throw new IllegalArgumentException("用户ID不能为空");
+        }
+        if (updateData == null) {
+            throw new IllegalArgumentException("更新数据不能为空");
+        }
         User existing = userDb.get(id);
-        // BUG: 这里没有做 null 检查，NPE 风险
-        existing.setUsername(updateData.getUsername());
-        existing.setEmail(updateData.getEmail());
-        existing.setPhone(updateData.getPhone());
+        if (existing == null) {
+            throw new RuntimeException("用户不存在: id=" + id);
+        }
+        if (updateData.getUsername() != null) {
+            existing.setUsername(updateData.getUsername());
+        }
+        if (updateData.getEmail() != null) {
+            existing.setEmail(updateData.getEmail());
+        }
+        if (updateData.getPhone() != null) {
+            existing.setPhone(updateData.getPhone());
+        }
         existing.setUpdatedAt(LocalDateTime.now());
         return existing;
     }
@@ -97,9 +111,12 @@ public class UserService {
      * 搜索用户 - 按用户名模糊匹配
      */
     public List<User> search(String keyword) {
-        // BUG: keyword 为 null 时会 NPE
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        String lowerKeyword = keyword.toLowerCase().trim();
         return userDb.values().stream()
-                .filter(u -> u.getUsername().toLowerCase().contains(keyword.toLowerCase()))
+                .filter(u -> u.getUsername().toLowerCase().contains(lowerKeyword))
                 .collect(Collectors.toList());
     }
 
