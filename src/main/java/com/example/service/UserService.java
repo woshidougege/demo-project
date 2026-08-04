@@ -19,6 +19,9 @@ public class UserService {
 
     // 模拟数据库
     private final Map<Long, User> userDb = new ConcurrentHashMap<>();
+    // 登录失败计数
+    private final Map<String, Integer> loginFailCount = new ConcurrentHashMap<>();
+    private static final int MAX_LOGIN_ATTEMPTS = 5;
 
     /**
      * 根据ID查询用户
@@ -145,19 +148,28 @@ public class UserService {
     }
 
     /**
-     * 验证用户登录
-     * BUG: 密码比较应该用 BCrypt，这里直接用 equals
+     * 验证用户登录（含失败次数限制）
      */
     public User login(String username, String password) {
+        if (username == null || password == null) {
+            throw new IllegalArgumentException("用户名和密码不能为空");
+        }
+        // 检查是否已被锁定
+        Integer failCount = loginFailCount.getOrDefault(username, 0);
+        if (failCount >= MAX_LOGIN_ATTEMPTS) {
+            throw new RuntimeException("账号已锁定，请 30 分钟后再试");
+        }
         for (User user : userDb.values()) {
             if (user.getUsername().equals(username)) {
                 if (user.getPasswordHash().equals(password)) {
+                    loginFailCount.remove(username);
                     return user;
                 }
-                throw new RuntimeException("密码错误");
+                loginFailCount.merge(username, 1, Integer::sum);
+                throw new RuntimeException("密码错误，还剩 " + (MAX_LOGIN_ATTEMPTS - failCount - 1) + " 次机会");
             }
         }
-        return null; // 用户不存在时返回 null，调用方可能没处理
+        throw new RuntimeException("用户不存在: " + username);
     }
 
     private Long generateId() {
