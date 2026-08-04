@@ -71,8 +71,18 @@ public class UserService {
      * 更新用户信息
      */
     public User update(Long id, User updateData) {
+        if (id == null) {
+            throw new IllegalArgumentException("用户ID不能为空");
+        }
+        if (updateData == null) {
+            throw new IllegalArgumentException("更新数据不能为空");
+        }
+
         User existing = userDb.get(id);
-        // BUG: 这里没有做 null 检查，NPE 风险
+        if (existing == null) {
+            throw new IllegalArgumentException("用户不存在: id=" + id);
+        }
+
         existing.setUsername(updateData.getUsername());
         existing.setEmail(updateData.getEmail());
         existing.setPhone(updateData.getPhone());
@@ -148,6 +158,15 @@ public class UserService {
                 .max(Long::compareTo)
                 .orElse(0L) + 1;
     }
-}
 
-// DEMO: temporary change for @git diff demo
+    /**
+     * 检查用户名是否可用
+     */
+    public boolean isUsernameAvailable(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return false;
+        }
+        return userDb.values().stream()
+                .noneMatch(u -> u.getUsername().equalsIgnoreCase(username));
+    }
+}

@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn test)",
+      "Bash(mvn compile)",
+      "Bash(git status)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(cat *)",
+      "Bash(ls *)",
+      "Read",
+      "Glob",
+      "Grep"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(git push *)",
+      "Bash(mvn deploy*)"
+    ],
+    "ask": [
+      "Write",
+      "Edit",
+      "Bash(git commit*)",
+      "Bash(git checkout*)"
+    ]
+  }
+}
