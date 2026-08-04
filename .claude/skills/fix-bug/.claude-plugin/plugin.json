@@ -1,7 +1,0 @@
-{
-  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
-  "name": "fix-bug",
-  "version": "0.1.0",
-  "description": "分析并修复 bug",
-  "skills": ["./"]
-}
